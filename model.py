@@ -2,22 +2,22 @@ import re
 import csv
 import random
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import pickle
+import logging
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from collections import Counter
 from sklearn.utils import shuffle
-import matplotlib.pyplot as plt
-
+from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import model_from_json, load_model
-from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import Input, Embedding, LSTM, Dense, Bidirectional, Dropout
 from tensorflow.keras.models import Sequential, Model, load_model
+
 from variables import *
 from util import*
 
@@ -25,10 +25,9 @@ physical_devices = tf.config.experimental.list_physical_devices('GPU')
 print("\n Num GPUs Available: {}\n".format(len(physical_devices)))
 tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
-import logging
-logging.getLogger('tensorflow').disabled = True
-
 np.random.seed(seed)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+logging.getLogger('tensorflow').disabled = True
 warnings.simplefilter("ignore", DeprecationWarning)
 
 class PolicyClassification:
@@ -75,12 +74,12 @@ class PolicyClassification:
 
     def feature_extractor(self): # Building the RNN model
         inputs = Input(shape=(max_length,))
-        x = Embedding(output_dim=embedding_dimS, input_dim=vocab_size, input_length=max_length, name='embedding')(inputs)
-        x = Bidirectional(LSTM(size_lstm), name='bidirectional_lstm')(x)
+        x = Embedding(output_dim=embedding_dimS, input_dim=vocab_size, input_length=max_length, name='embedding')(inputs) # Embedding layer
+        x = Bidirectional(LSTM(size_lstm), name='bidirectional_lstm')(x) # Bidirectional LSTM layer
         x = Dense(dense1, activation='relu')(x)
-        x = Dense(dense1, activation='relu')(x)
+        x = Dense(dense1, activation='relu')(x) 
         x = Dropout(keep_prob)(x)
-        x = Dense(dense2, activation='relu')(x)
+        x = Dense(dense2, activation='relu')(x) 
         x = Dense(dense2, activation='relu')(x)
         x = Dense(dense2, activation='relu')(x)
         x = Dropout(keep_prob)(x)
