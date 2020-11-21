@@ -7,14 +7,14 @@ vocab_size = 6000
 min_samples = 10
 
 
-n_topics = 5
-n_words = 10 
-min_df = 10
-max_iter = 15
-search_params = {
-                'n_components': [10, 15, 20, 25, 30], 
-                'learning_decay': [.5, .7, .9]
-                }
+# n_topics = 5
+# n_words = 10 
+# min_df = 10
+# max_iter = 15
+# search_params = {
+#                 'n_components': [10, 15, 20, 25, 30], 
+#                 'learning_decay': [.5, .7, .9]
+#                 }
 
 
 max_length = 100
