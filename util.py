@@ -92,16 +92,16 @@ def preprocessed_data(reviews):
 
     return np.array(updated_reviews)
 
-def preprocess_labels(column):
+def preprocess_labels(column): # preprocess label strings by removing digits and strips
     column = column.str.replace('[^\w\s]','')
     column = column.str.replace('[0-9]','')
     column = column.str.strip()
     column = column.str.lower()
     return column
 
-def filter_labels(Y):
+def filter_labels(Y): # Filter labels which has less samples than min_samples
     label_count = Counter(Y)
-    required_labels = [label for label, count in label_count.items() if int(count) > min_samples]
+    required_labels = [label for label, count in label_count.items() if int(count) >= min_samples]
     required_labels = np.array(required_labels)
     valid_indices = np.where(np.in1d(Y, required_labels))[0]
     return valid_indices
@@ -118,23 +118,23 @@ def load_data():
     classes = preprocess_labels(df['main category']).values 
     policy_texts = df['terms list'].values
 
-    policy_texts = preprocessed_data(policy_texts)
+    policy_texts = preprocessed_data(policy_texts) # preprocess raw text
 
-    X, Y = shuffle(policy_texts, classes)
+    X, Y = shuffle(policy_texts, classes) # shuffle data
     valid_indices = filter_labels(Y)
     X = X[valid_indices]
     Y = Y[valid_indices]
 
-    encoder = LabelEncoder()
+    encoder = LabelEncoder() # fit the label encorder with string labels
     encoder.fit(Y)
     Y = encoder.transform(Y)
 
     X, Y = shuffle(X, Y)
-    Ntrain = int(cutoff * len(Y))
-    Xtrain, Xtest = X[:Ntrain], X[Ntrain:]
+    Ntrain = int(cutoff * len(Y)) # split train and test data
+    Xtrain, Xtest = X[:Ntrain], X[Ntrain:] 
     Ytrain, Ytest = Y[:Ntrain], Y[Ntrain:]
-
-    class_data = dict(Counter(Y))
+ 
+    class_data = dict(Counter(Y)) # create class dict to handle class imbalance problem
     class_weights = class_weight.compute_class_weight('balanced',
                                                     np.unique(Y),
                                                     Y)
