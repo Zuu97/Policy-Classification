@@ -1,6 +1,6 @@
 # WebSite Policy Classification
 
-Classify differnt policy types in websites and detect anomaly policies to analyse scam websites. Using LSTM model classify policy text by supervised learning techniques and
+Classify different policy types in websites and detect anomaly policies to analyse scam websites. Using LSTM model classify policy text by supervised learning techniques and
 using that handle anomaly policy texts to identify scam websutes.
 
 # Techniques
