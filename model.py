@@ -2,11 +2,13 @@ import re
 import csv
 import random
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import pickle
 import logging
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+logging.getLogger('tensorflow').disabled = True
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from collections import Counter
@@ -29,6 +31,9 @@ np.random.seed(seed)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 logging.getLogger('tensorflow').disabled = True
 warnings.simplefilter("ignore", DeprecationWarning)
+
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 class PolicyClassification:
     def __init__(self):
@@ -58,6 +63,7 @@ class PolicyClassification:
         wordcloud.generate(long_string)
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis("off")
+        plt.savefig('wordcloud.png')
         plt.show()
 
     def handle_data(self):
@@ -125,5 +131,8 @@ class PolicyClassification:
             self.save_model()
 
 if __name__ == "__main__":
+
+    if not os.path.exists(os.path.join(os.getcwd(), 'weights')):
+        os.makedirs(os.path.join(os.getcwd(), 'weights'))
     model = PolicyClassification()
     model.run()
