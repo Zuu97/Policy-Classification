@@ -1,9 +1,9 @@
 import os
-seed = 42
+seed = 1111
 csv_file_paths = os.path.join(os.getcwd(), "data")
 final_csv_path = 'policy_texts.csv'
-cutoff = 0.9
-vocab_size = 6000
+cutoff = 0.8
+vocab_size = 2000
 min_samples = 10
 subtopics = [
         'how use collected information', 
