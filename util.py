@@ -23,11 +23,11 @@ def get_csv_data(csv_path):
     '''
     df = pd.read_csv(csv_path, encoding='ISO 8859-1')
     df.columns = map(str.lower, df.columns)
-    df = df[['terms list', 'main category']]
-    df['main category'] = df['main category'].str.lower()
-    df['main category'] = df['main category'].str.strip()
+    df = df[['terms', 'subtopic']]
     df = df.dropna(axis=1, how='all') 
-    df = df[df['terms list'].notna()]
+    df['subtopic'] = df['subtopic'].str.lower()
+    df['subtopic'] = df['subtopic'].str.strip()
+    df = df[df['terms'].notna()]
     df = df.replace(to_replace=[r"\\t|\\n|\\r", "\t|\n|\r"], value=["",""], regex=True)
     df = df.replace(r'^\s*$', np.nan, regex=True)
     df = df.fillna(method='ffill')
@@ -50,7 +50,7 @@ def load_csvs():
 
 def lemmatization(lemmatizer,sentence):
     '''
-        Lematize texts in the terms list
+        Lematize texts in the terms
     '''
     lem = [lemmatizer.lemmatize(k) for k in sentence]
     lem = set(lem)
@@ -58,7 +58,7 @@ def lemmatization(lemmatizer,sentence):
 
 def remove_stop_words(stopwords_list,sentence):
     '''
-        Remove stop words in texts in the terms list
+        Remove stop words in texts in the terms
     '''
     return [k for k in sentence if k not in stopwords_list]
 
@@ -80,7 +80,7 @@ def preprocess_one(review):
 
 def preprocessed_data(reviews):
     '''
-        Preprocess entire terms list
+        Preprocess entire terms
     '''
     updated_reviews = []
     if isinstance(reviews, np.ndarray) or isinstance(reviews, list):
@@ -115,8 +115,8 @@ def load_data():
 
     df = pd.read_csv(final_csv_path)
 
-    classes = preprocess_labels(df['main category']).values 
-    policy_texts = df['terms list'].values
+    classes = preprocess_labels(df['subtopic']).values 
+    policy_texts = df['terms'].values
 
     policy_texts = preprocessed_data(policy_texts) # preprocess raw text
 
@@ -141,3 +141,5 @@ def load_data():
     class_weights = {i : class_weights[i] for i in range(len(set(Y)))}
 
     return Xtrain, Xtest, Ytrain, Ytest, class_weights
+
+load_data()
