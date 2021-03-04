@@ -3,7 +3,7 @@ seed = 1111
 csv_file_paths = os.path.join(os.getcwd(), "data")
 final_csv_path = 'policy_texts.csv'
 cutoff = 0.8
-vocab_size = 2000
+vocab_size = 2500
 min_samples = 10
 subtopics = [
         'how use collected information', 
@@ -24,14 +24,15 @@ subtopics = [
 #                 }
 
 
-max_length = 40
+max_length = 30
 embedding_dimS = 256
 trunc_type = 'post'
 oov_tok = "<OOV>"
-num_epochs = 20
+num_epochs = 30
 batch_size = 64
 size_lstm  = 256
 dense1 = 256
-dense2 = 64
-keep_prob = 0.5
+dense2 = 128
+dense3 = 64
+keep_prob = 0.4
 sentiment_weights = "weights/model.h5"

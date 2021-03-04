@@ -129,17 +129,14 @@ def load_data():
     encoder.fit(Y)
     Y = encoder.transform(Y)
 
-    X, Y = shuffle(X, Y)
-    Ntrain = int(cutoff * len(Y)) # split train and test data
-    Xtrain, Xtest = X[:Ntrain], X[Ntrain:] 
-    Ytrain, Ytest = Y[:Ntrain], Y[Ntrain:]
+    # X, Y = shuffle(X, Y)
+    # Ntrain = int(cutoff * len(Y)) # split train and test data
+    # Xtrain, Xtest = X[:Ntrain], X[Ntrain:] 
+    # Ytrain, Ytest = Y[:Ntrain], Y[Ntrain:]
  
     class_data = dict(Counter(Y)) # create class dict to handle class imbalance problem
     class_weights = class_weight.compute_class_weight('balanced',
                                                     np.unique(Y),
                                                     Y)
     class_weights = {i : class_weights[i] for i in range(len(set(Y)))}
-
-    return Xtrain, Xtest, Ytrain, Ytest, class_weights
-
-load_data()
+    return X, Y, class_weights
