@@ -2,7 +2,7 @@ import os
 seed = 1111
 csv_file_paths = os.path.join(os.getcwd(), "data")
 final_csv_path = 'policy_texts.csv'
-cutoff = 0.8
+cutoff = 0.1
 vocab_size = 2500
 min_samples = 10
 subtopics = [
@@ -28,7 +28,7 @@ max_length = 30
 embedding_dimS = 256
 trunc_type = 'post'
 oov_tok = "<OOV>"
-num_epochs = 30
+num_epochs = 20
 batch_size = 64
 size_lstm  = 256
 dense1 = 256
