@@ -118,12 +118,15 @@ def load_data():
     classes = preprocess_labels(df['subtopic']).values 
     policy_texts = df['terms'].values
 
+    policy_texts_original = policy_texts
     policy_texts = preprocessed_data(policy_texts) # preprocess raw text
 
-    X, Y = shuffle(policy_texts, classes) # shuffle data
+    Xoriginal, X, Y = shuffle(policy_texts_original, policy_texts, classes) # shuffle data
     valid_indices = filter_labels(Y)
     X = X[valid_indices]
     Y = Y[valid_indices]
+    Xoriginal = Xoriginal[valid_indices]
+    Yoriginal = Y
 
     encoder = LabelEncoder() # fit the label encorder with string labels
     encoder.fit(Y)
@@ -140,4 +143,4 @@ def load_data():
                                                     np.unique(Y),
                                                     Y)
     class_weights = {i : class_weights[i] for i in range(len(set(Y)))}
-    return X, Y, Xtest, Ytest, class_weights
+    return X, Y, Xtest, Ytest, class_weights, encoder, Xoriginal, Yoriginal

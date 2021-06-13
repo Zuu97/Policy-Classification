@@ -5,6 +5,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import pickle
 import logging
+import itertools
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -13,6 +14,7 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from collections import Counter
 from sklearn.utils import shuffle
+from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -37,17 +39,20 @@ tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 class PolicyClassification:
     def __init__(self):
-        X, Y, Xtest, Ytest, class_weights = load_data()
+        X, Y, Xtest, Ytest, class_weights, encoder, Xoriginal, Yoriginal = load_data()
         self.X = X
         self.Y = Y
         self.Xtest = Xtest
         self.Ytest = Ytest
+        self.encoder = encoder
+        self.Xoriginal = Xoriginal
+        self.Yoriginal = Yoriginal
         self.class_weights = class_weights
         self.size_output = len(set(self.Y))
         # self.word_cloud_visualization()
-        print(" num categories : {}".format(self.size_output))
-        print(" Input Shape : {}".format(self.X.shape))
-        print(" Label Shape : {}".format(self.Y.shape))
+        # print(" num categories : {}".format(self.size_output))
+        # print(" Input Shape : {}".format(self.X.shape))
+        # print(" Label Shape : {}".format(self.Y.shape))
 
     def word_cloud_visualization(self): # create word cloud to analyze most appeared words in data corpus
         policy_texts = self.X.tolist()
@@ -121,14 +126,73 @@ class PolicyClassification:
                         metrics=['accuracy']
                         )
 
+    def plot_confusion_matrix(self, X, Y, cmap=None, normalize=False):
+        
+        P = np.argmax(self.model.predict(X), axis=-1)
+        # Y = np.argmax(Y, axis=-1)
+        cm = confusion_matrix(Y, P)
+
+        if cmap is None:
+            cmap = plt.get_cmap('Blues')
+
+        plt.figure(figsize=(30, 30))
+        plt.rcParams.update({'font.size': 22})
+        plt.imshow(cm, interpolation='nearest', cmap=cmap)
+        plt.title('Confusion Matrix for Website Policy Classification')
+        plt.colorbar()
+
+        class_names = list(set(self.encoder.inverse_transform(Y)))
+
+        if class_names is not None:
+            tick_marks = np.arange(len(class_names))
+            plt.xticks(tick_marks, class_names, rotation=0)
+            plt.yticks(tick_marks, class_names)
+
+        if normalize:
+            cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+
+        thresh = cm.max() / 1.5 if normalize else cm.max() / 2
+        for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+            if normalize:
+                plt.text(j, i, "{:0.4f}".format(cm[i, j]),
+                        horizontalalignment="center",
+                        color="white" if cm[i, j] > thresh else "black")
+            else:
+                plt.text(j, i, "{:,}".format(cm[i, j]),
+                        horizontalalignment="center",
+                        color="white" if cm[i, j] > thresh else "black")
+
+
+        plt.tight_layout()
+        plt.ylabel('True Policies')
+        plt.xlabel('Predicted Policies')
+        plt.savefig(cm_path)
+
+    def vis_results(self):
+        for y_orig, x in zip(self.Yoriginal, self.Xoriginal):
+            x_orig = x
+            x = preprocess_one(x)
+            x_seq = self.tokenizer.texts_to_sequences([x]) # tokenize x
+            x_pad = pad_sequences(x_seq, maxlen=max_length)# Pad x
+            p = np.argmax(self.model.predict(x_pad), axis=-1)
+            y = self.encoder.inverse_transform(p)[0]
+            print("Policy Text      : {}".format(x_orig))
+            print("True policy      : {}".format(y_orig))
+            print("Predicted policy : {}\n".format(y))
+
     def run(self):
+        self.handle_data()
+
         if os.path.exists(sentiment_weights):
             self.load_model()
         else:
-            self.handle_data()
             self.feature_extractor()
             self.train()
             self.save_model()
+
+        self.plot_confusion_matrix(self.X_pad, self.Y)
+        self.vis_results()
 
 if __name__ == "__main__":
 

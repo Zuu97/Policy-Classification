@@ -36,3 +36,4 @@ dense2 = 128
 dense3 = 64
 keep_prob = 0.4
 sentiment_weights = "weights/model.h5"
+cm_path = "weights/confusion_matrix.png"
